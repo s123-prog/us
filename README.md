@@ -1,7 +1,8 @@
-START 200
-MOVER AREG, ='5'
-ADD BREG, X
-MOVEM AREG, Y
-X DS 1
-Y DS 1
-END
+        START   200
+        MOVER   AREG, ='5'
+        ADD     BREG, X
+        MOVEM   AREG, Y
+
+X       DS      1
+Y       DS      1
+        END
