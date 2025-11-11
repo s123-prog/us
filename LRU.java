@@ -20,15 +20,15 @@ public class LRU {
         frames = new int[m];
     }
 
-    void displayFrames() {
-        System.out.print("Frames: ");
+    void displayFrames(int page, boolean hit) {
+        System.out.print("Page " + page + " -> ");
         for (int i = 0; i < m; i++) {
             if (frames[i] == -1)
                 System.out.print("[ ] ");
             else
                 System.out.print("[" + frames[i] + "] ");
         }
-        System.out.println();
+        System.out.println(hit ? " (HIT)" : " (MISS)");
     }
 
     void runLRU() {
@@ -39,65 +39,60 @@ public class LRU {
 
         for (int i = 0; i < n; i++) {
             int page = pages[i];
-            // Check for hit
-             boolean hit = false;
+            boolean hit = false;
             for (int j = 0; j < m; j++) {
                 if (frames[j] == page) {
                     hit = true;
                     break;
                 }
             }
-            if (hit) {
-                System.out.print("Page: " + page + " (HIT)  ");
-                displayFrames();
-                continue;
-            }
 
-            // Miss -> page fault
-            pageFaults++;
+            if (!hit) {   // MISS case
+                pageFaults++;
 
-           // So for the first few pages, we just fill up empty frames — no replacement yet.
-            boolean placed = false;
-            for (int j = 0; j < m; j++) {
-                if (frames[j] == -1) {
-                    frames[j] = page;
-                    placed = true;
-                    break;
+                boolean placed = false;
+                for (int j = 0; j < m; j++) {
+                    if (frames[j] == -1) {
+                        frames[j] = page;
+                        placed = true;
+                        break;
+                    }
                 }
-            }
 
-            // No empty frame -> replace LRU
-            if (!placed) {
-                int lruIndex = 0;
-                int smallestLastUse = Integer.MAX_VALUE; // smaller index => older
+                if (!placed) {
+                    int lruIndex = 0;
+                    int smallestLastUse = Integer.MAX_VALUE;
 
-                for (int j = 0; j < m; j++) {              // check every frame one by one
-                    int lastPos = -1;                      // store when this page was last used
-                    for (int k = i - 1; k >= 0; k--) {     // look backward in the reference string
-                        if (pages[k] == frames[j]) {       // did we find this page used before?
-                            lastPos = k;                   // yes, record its position (index)
-                            break;                         // stop after finding the first recent use
+                    for (int j = 0; j < m; j++) {
+                        int lastPos = -1;
+                        for (int k = i - 1; k >= 0; k--) {
+                            if (pages[k] == frames[j]) {
+                                lastPos = k;
+                                break;
+                            }
+                        }
+
+                        if (lastPos < smallestLastUse) {
+                            smallestLastUse = lastPos;
+                            lruIndex = j;
                         }
                     }
-                    if (lastPos < smallestLastUse) {       // smaller = used earlier or never used
-                        smallestLastUse = lastPos;         // update least recently used info
-                        lruIndex = j;                      // remember this frame index
-                    }
+
+                    frames[lruIndex] = page;
                 }
-                frames[lruIndex] = page;                   // replace that page with the new one
+            }
 
-
-            System.out.print("Page: " + page + " (MISS) ");
-            displayFrames();
+            // Print frames every iteration (show HIT / MISS)
+            displayFrames(page, hit);
         }
-
+        System.out.println("\n--- Result ---");
         int hits = n - pageFaults;
-        System.out.println("\nTotal page faults: " + pageFaults);
+        System.out.println("Total page faults: " + pageFaults);
         System.out.println("Total hits: " + hits);
-        System.out.printf("Fault ratio: %.4f\n", (double) pageFaults / n);
-        System.out.printf("Hit ratio: %.4f\n", (double) hits / n);
+        System.out.printf("Fault ratio: %.2f\n", (double) pageFaults *100.0 / n);
+        System.out.printf("Hit ratio: %.2f\n", (double) hits*100.0 / n);
     }
-    }
+
     public static void main(String[] args) {
         LRU sim = new LRU();
         sim.readInput();
