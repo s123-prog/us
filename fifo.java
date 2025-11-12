@@ -1,7 +1,7 @@
 import java.util.*;
 
 public class fifo {
-    private int[] pages;
+     int[] pages;
     private int frames;
     private int faults, hits;
     private final Scanner sc = new Scanner(System.in);
@@ -48,10 +48,11 @@ public class fifo {
         System.out.println("\nTotal Pages : " + pages.length);
         System.out.println("Frames      : " + frames);
         System.out.println("Page Faults : " + faults);
-        System.out.printf("Fault Ratio : %.2f%%\n", (faults * 100.0 / pages.length));
+        System.out.println("Fault Ratio : "+(faults * 100.0 / pages.length));
         System.out.println("Hits        : " + hits);
-        System.out.printf("Hit Ratio   : %.2f%%\n", (hits * 100.0 / pages.length));
+        System.out.println("Hit Ratio   : "+ (hits * 100.0 / pages.length));
     }
+
 
     public static void main(String[] args) {
         fifo fifo = new fifo();
